@@ -1,6 +1,204 @@
-.App {
-  text-align: center;
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #f0f4f8;
+  color: #333;
+}
+
+.App {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-header {
+  background: #1a73e8;
+  color: white;
+  padding: 1rem 2rem;
+}
+
+.app-header h1 {
+  font-size: 1.4rem;
+  margin-bottom: 0.75rem;
+}
+
+.nav-abas {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.aba-btn {
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  color: white;
+  padding: 0.4rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background 0.2s;
+}
+
+.aba-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.aba-btn.ativa {
+  background: white;
+  color: #1a73e8;
+  font-weight: 600;
+}
+
+.conteudo {
+  padding: 2rem;
+  max-width: 1000px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.card {
+  background: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.card h2 {
+  font-size: 1.15rem;
+  margin-bottom: 1rem;
+  color: #1a73e8;
+  border-bottom: 2px solid #e8f0fe;
+  padding-bottom: 0.5rem;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  align-items: end;
+}
+
+.form-grid label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #555;
+}
+
+.form-grid input,
+.form-grid select {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  width: 100%;
+}
+
+.form-grid input:focus,
+.form-grid select:focus {
+  outline: none;
+  border-color: #1a73e8;
+}
+
+.checkbox-label {
+  flex-direction: row !important;
+  align-items: center;
+  gap: 0.5rem !important;
+}
+
+.checkbox-label input {
+  width: auto !important;
+}
+
+.form-grid button,
+button[type="submit"] {
+  grid-column: 1 / -1;
+  background: #1a73e8;
+  color: white;
+  border: none;
+  padding: 0.6rem 1.5rem;
+  border-radius: 4px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background 0.2s;
+  width: fit-content;
+}
+
+.form-grid button:hover,
+button[type="submit"]:hover {
+  background: #1558b0;
+}
+
+.form-grid button:disabled {
+  background: #aaa;
+  cursor: not-allowed;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+th {
+  background: #e8f0fe;
+  color: #1a73e8;
+  text-align: left;
+  padding: 0.6rem 0.75rem;
+}
+
+td {
+  padding: 0.55rem 0.75rem;
+  border-bottom: 1px solid #eee;
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+tr:hover td {
+  background: #f9fbff;
+}
+
+.btn-excluir {
+  background: #e53935;
+  color: white;
+  border: none;
+  padding: 0.3rem 0.7rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.8rem;
+}
+
+.btn-excluir:hover {
+  background: #b71c1c;
+}
+
+.info {
+  color: #888;
+  font-style: italic;
+}
+
+.erro {
+  color: #e53935;
+  margin-top: 0.75rem;
+  font-size: 0.9rem;
+}
+
+.sucesso {
+  color: #2e7d32;
+  margin-top: 0.75rem;
+  font-size: 0.9rem;
+}
+
 
 .App-logo {
   height: 40vmin;

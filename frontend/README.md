@@ -1,70 +1,68 @@
-# Getting Started with Create React App
+# Frontend — Sistema de Agendamento de Consultas
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Interface React que consome os dois serviços do sistema distribuído.
 
-## Available Scripts
+---
 
-In the project directory, you can run:
+## Como rodar
 
-### `npm start`
+```bash
+cd frontend
+npm start
+```
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+> Os backends precisam estar rodando antes de abrir o frontend.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+---
 
-### `npm test`
+## Backends necessários
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+| Serviço | Porta | Como rodar |
+|---|---|---|
+| servico_medicos | 8001 | `python manage.py runserver 8001` |
+| servico_agendamentos | 8002 | `python manage.py runserver 8002` |
 
-### `npm run build`
+---
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## Comunicação com os backends (Proxy)
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### O problema
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+O frontend React roda em `localhost:3000`. Os backends Django rodam em `localhost:8001` e `localhost:8002`. Quando o browser tenta fazer uma requisição de uma porta para outra, ele bloqueia por segurança — isso se chama **política de mesma origem (CORS)**.
 
-### `npm run eject`
+No Codespaces o problema é ainda pior: cada porta tem uma URL diferente, e o browser bloqueia requisições entre URLs distintas.
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+### A solução: Proxy
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+O arquivo `src/setupProxy.js` configura o próprio servidor do React como **intermediário**:
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+```
+Browser → React (porta 3000) → Django Médicos (porta 8001)
+Browser → React (porta 3000) → Django Agendamentos (porta 8002)
+```
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+O browser faz tudo para a porta 3000 (mesma origem, sem bloqueio). O React dev server recebe e **repassa** para o backend correto nos bastidores.
 
-## Learn More
+### As regras do proxy
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+```js
+// /medicos e /especialidades → vai para porta 8001
+app.use(['/medicos', '/especialidades'], proxy({ target: 'http://localhost:8001' }))
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+// /agendas e /agendamentos → vai para porta 8002
+app.use(['/agendas', '/agendamentos'], proxy({ target: 'http://localhost:8002' }))
+```
 
-### Code Splitting
+### O que isso muda no código
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+As URLs das requisições são **relativas** (sem host):
 
-### Analyzing the Bundle Size
+```js
+fetch('/medicos/')       // o proxy encaminha para http://localhost:8001/medicos/
+fetch('/agendamentos/')  // o proxy encaminha para http://localhost:8002/agendamentos/
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+| Arquivo | O que faz |
+|---|---|
+| `src/setupProxy.js` | Define as regras de redirecionamento |
+| `src/api.js` | Usa URLs relativas, deixando o proxy resolver o destino |

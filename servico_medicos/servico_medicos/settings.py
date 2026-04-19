@@ -25,7 +25,9 @@ SECRET_KEY = "django-insecure-#403ev*v*irk(85(&q=m8&7y7*(2!hkjwx(#8$=^)rgbom1g&)
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
+
+CORS_ALLOW_ALL_ORIGINS = True
 
 
 # Application definition
@@ -53,9 +55,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-CORS_ALLOWED_ORIGINS = [
-    'http://localhost:8000',
-]
+
 
 ROOT_URLCONF = "servico_medicos.urls"
 
