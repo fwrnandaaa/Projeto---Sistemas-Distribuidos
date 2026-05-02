@@ -1,5 +1,5 @@
-const MEDICOS_API = '';
-const AGENDAMENTOS_API = '';
+const MEDICOS_API = 'http://localhost:8000';
+const AGENDAMENTOS_API = 'http://localhost:8000';
 
 export const api = {
   // Médicos

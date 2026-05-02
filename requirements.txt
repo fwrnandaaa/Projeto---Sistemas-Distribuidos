@@ -1,0 +1,19 @@
+
+# Django e REST Framework 
+django>=4.2,<5.0
+djangorestframework>=3.14
+
+# CORS (necessário para o frontend React acessar as APIs)
+django-cors-headers>=4.3
+
+# HTTP client — usado pelo gateway para chamar os microserviços
+requests>=2.31
+
+# Documentação Swagger automática — usado no gateway
+drf-yasg>=1.21
+
+# Gateway FastAPI
+fastapi>=0.110
+uvicorn>=0.29
+httpx>=0.27
+ 
