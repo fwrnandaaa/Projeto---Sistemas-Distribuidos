@@ -10,7 +10,7 @@ Antes de rodar pela primeira vez, instale as dependências em cada pasta.
 
 `venv\Scripts\Activate.ps1`
 
-`pip install -r requirements.txt`
+`pip install -r ../requirements.txt`
 
 # Serviço de Agendamentos
 
@@ -20,7 +20,7 @@ Antes de rodar pela primeira vez, instale as dependências em cada pasta.
 
 `venv\Scripts\Activate.ps1`
 
-`pip install -r requirements.txt`
+`pip install -r ../requirements.txt`
 
 # Gateway
 `cd gateway_fastapi`
@@ -29,7 +29,7 @@ Antes de rodar pela primeira vez, instale as dependências em cada pasta.
 
 `venv\Scripts\Activate.ps1`
 
-`pip install -r requirements.txt`
+`pip install -r ../requirements.txt`
 
 # Frontend
 `cd frontend`
