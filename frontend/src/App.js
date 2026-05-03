@@ -1,15 +1,17 @@
 import { useState } from 'react';
 import './App.css';
-import Medicos from './components/Medicos';
-import Agendas from './components/Agendas';
-import Agendamentos from './components/Agendamentos';
-import NovoAgendamento from './components/NovoAgendamento';
+import Medicos from './components/paginas/Medicos';
+import Agendas from './components/paginas/Agendas';
+import Agendamentos from './components/paginas/Agendamentos';
+import NovoAgendamento from './components/paginas/NovoAgendamento';
+import GerenciarMedicos from './components/paginas/GerenciarMedicos';
 
 const ABAS = [
   { id: 'marcar', label: 'Marcar Consulta' },
   { id: 'agendamentos', label: 'Consultas Agendadas' },
   { id: 'agendas', label: 'Gerenciar Agendas' },
   { id: 'medicos', label: 'Médicos' },
+  { id: 'gerenciar-medicos', label: 'Gerenciar Médicos' },
 ];
 
 function App() {
@@ -37,6 +39,7 @@ function App() {
         {abaAtiva === 'agendamentos' && <Agendamentos />}
         {abaAtiva === 'agendas' && <Agendas />}
         {abaAtiva === 'medicos' && <Medicos />}
+        {abaAtiva === 'gerenciar-medicos' && <GerenciarMedicos />}
       </main>
     </div>
   );

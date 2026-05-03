@@ -1,29 +1,34 @@
-const MEDICOS_API = 'http://localhost:8000';
-const AGENDAMENTOS_API = 'http://localhost:8000';
-
 export const api = {
   // Médicos
-  getMedicos: () => fetch(`${MEDICOS_API}/medicos/`).then(r => r.json()),
-  getEspecialidades: () => fetch(`${MEDICOS_API}/especialidades/`).then(r => r.json()),
-
-  // Agendas
-  getAgendas: () => fetch(`${AGENDAMENTOS_API}/agendas/`).then(r => r.json()),
-  createAgenda: (data) =>
-    fetch(`${AGENDAMENTOS_API}/agendas/`, {
+  // caminhos relativos usados são interceptados pelo proxy do react, em setupProxy.js
+  getMedicos: () => fetch('/medicos/').then(r => r.json()), 
+  getEspecialidades: () => fetch('/especialidades/').then(r => r.json()),
+  createMedico: (data) =>
+    fetch('/medicos/', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
     }).then(r => r.json()),
-  deleteAgenda: (id) => fetch(`${AGENDAMENTOS_API}/agendas/${id}/`, { method: 'DELETE' }),
+  deleteMedico: (id) => fetch(`/medicos/${id}/`, { method: 'DELETE' }),
+
+  // Agendas
+  getAgendas: () => fetch('/agendas/').then(r => r.json()),
+  createAgenda: (data) =>
+    fetch('/agendas/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    }).then(r => r.json()),
+  deleteAgenda: (id) => fetch(`/agendas/${id}/`, { method: 'DELETE' }),
 
   // Agendamentos
-  getAgendamentos: () => fetch(`${AGENDAMENTOS_API}/agendamentos/`).then(r => r.json()),
+  getAgendamentos: () => fetch('/agendamentos/').then(r => r.json()),
   createAgendamento: (data) =>
-    fetch(`${AGENDAMENTOS_API}/agendamentos/`, {
+    fetch('/agendamentos/', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
     }).then(r => r.json()),
   deleteAgendamento: (id) =>
-    fetch(`${AGENDAMENTOS_API}/agendamentos/${id}/`, { method: 'DELETE' }),
+    fetch(`/agendamentos/${id}/`, { method: 'DELETE' }),
 };

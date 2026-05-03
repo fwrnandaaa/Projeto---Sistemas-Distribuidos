@@ -30,11 +30,11 @@ npm start
 
 O frontend React roda em `localhost:3000`. Os backends Django rodam em `localhost:8001` e `localhost:8002`. Quando o browser tenta fazer uma requisição de uma porta para outra, ele bloqueia por segurança — isso se chama **política de mesma origem (CORS)**.
 
-No Codespaces o problema é ainda pior: cada porta tem uma URL diferente, e o browser bloqueia requisições entre URLs distintas.
+Em Codespaces, o problema é ainda maior: cada porta tem uma URL diferente, e o browser bloqueia requisições entre URLs distintas.
 
-### A solução: Proxy
+### A solução: Proxy com caminhos relativos
 
-O arquivo `src/setupProxy.js` configura o próprio servidor do React como **intermediário**:
+O arquivo `src/setupProxy.js` configura o próprio servidor do React como **intermediário**, e o `src/api.js` usa **caminhos relativos** para as requisições:
 
 ```
 Browser → React (porta 3000) → Django Médicos (porta 8001)
@@ -43,26 +43,71 @@ Browser → React (porta 3000) → Django Agendamentos (porta 8002)
 
 O browser faz tudo para a porta 3000 (mesma origem, sem bloqueio). O React dev server recebe e **repassa** para o backend correto nos bastidores.
 
-### As regras do proxy
+### Como funciona: setupProxy.js
+
+O arquivo `src/setupProxy.js` define as regras de redirecionamento:
 
 ```js
-// /medicos e /especialidades → vai para porta 8001
-app.use(['/medicos', '/especialidades'], proxy({ target: 'http://localhost:8001' }))
+const { createProxyMiddleware } = require('http-proxy-middleware');
 
-// /agendas e /agendamentos → vai para porta 8002
-app.use(['/agendas', '/agendamentos'], proxy({ target: 'http://localhost:8002' }))
+module.exports = function (app) {
+  // Requisições para /medicos e /especialidades → porta 8001
+  app.use(
+    ['/medicos', '/especialidades'],
+    createProxyMiddleware({ target: 'http://localhost:8001', changeOrigin: true })
+  );
+  
+  // Requisições para /agendas e /agendamentos → porta 8002
+  app.use(
+    ['/agendas', '/agendamentos'],
+    createProxyMiddleware({ target: 'http://localhost:8002', changeOrigin: true })
+  );
+};
 ```
 
-### O que isso muda no código
+### Como funciona: Caminhos relativos em api.js
 
-As URLs das requisições são **relativas** (sem host):
+No arquivo `src/api.js`, **todas as URLs são relativas** (sem `http://localhost:PORT`):
 
 ```js
-fetch('/medicos/')       // o proxy encaminha para http://localhost:8001/medicos/
-fetch('/agendamentos/')  // o proxy encaminha para http://localhost:8002/agendamentos/
+export const api = {
+  // Caminhos relativos — o proxy encaminha para http://localhost:8001
+  getMedicos: () => fetch('/medicos/').then(r => r.json()),
+  getEspecialidades: () => fetch('/especialidades/').then(r => r.json()),
+  
+  // Caminhos relativos — o proxy encaminha para http://localhost:8002
+  getAgendas: () => fetch('/agendas/').then(r => r.json()),
+  createAgenda: (data) =>
+    fetch('/agendas/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    }).then(r => r.json()),
+  
+  getAgendamentos: () => fetch('/agendamentos/').then(r => r.json()),
+  // ... etc
+};
 ```
+
+### O fluxo completo
+
+1. **Componente React** chama `api.getMedicos()`
+2. `api.getMedicos()` faz `fetch('/medicos/')`
+3. **Browser** envia a requisição para `http://localhost:3000/medicos/` (mesma origem ✓)
+4. **React dev server** intercepta a requisição via `setupProxy.js`
+5. **Proxy** identifica que é `/medicos` e redireciona para `http://localhost:8001/medicos/`
+6. **Backend de médicos** (porta 8001) processa e retorna os dados
+7. **Proxy** retorna a resposta para o React dev server
+8. **Browser** recebe a resposta com os dados ✓
+
+
+### Resumo: Arquivos importantes
 
 | Arquivo | O que faz |
-|---|---|
-| `src/setupProxy.js` | Define as regras de redirecionamento |
-| `src/api.js` | Usa URLs relativas, deixando o proxy resolver o destino |
+|---------|-----------|
+| `src/setupProxy.js` | Define as regras de redirecionamento (qual rota vai para qual porta) |
+| `src/api.js` | Centraliza todas as requisições usando caminhos relativos (`/medicos/`, `/agendas/`, etc.) |
+| Componentes (`components/paginas/*.js`) | Usam `api.js` para fazer requisições, sem se preocupar com portas |
+
+
+
