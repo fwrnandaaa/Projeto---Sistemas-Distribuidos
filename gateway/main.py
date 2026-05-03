@@ -112,11 +112,15 @@ def listar_agendas(request: Request, medico_id: int = None):
 
 @app.post("/agendas", tags=["Agendamentos"], status_code=201)
 def criar_agenda(payload: dict, request: Request):
+    medico_id = payload.get("medico_id")
+    medico_resp = httpx.get(f"{MEDICOS_URL}/medicos/{medico_id}/")
+    if medico_resp.status_code != 200:
+        raise HTTPException(status_code=400, detail="Médico não encontrado")
+    
     resp = httpx.post(f"{AGENDAMENTOS_URL}/agendas/", json=payload)
     if resp.status_code not in (200, 201):
         raise HTTPException(status_code=resp.status_code, detail=resp.text)
     return add_hateoas(resp.json(), request, "agendas")
-
 
 @app.delete("/agendas/{id}", tags=["Agendamentos"], status_code=204)
 def deletar_agenda(id: int):

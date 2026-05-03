@@ -11,3 +11,5 @@ const reportWebVitals = onPerfEntry => {
 };
 
 export default reportWebVitals;
+
+// arquivo gerado automaticamente pelo Create React App que serve para medir a performance da aplicação no navegador.
