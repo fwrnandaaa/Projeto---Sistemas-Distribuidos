@@ -1,6 +1,25 @@
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 import httpx
+from pydantic import BaseModel
+
+class MedicoSchema(BaseModel):
+    nome: str
+    crm: str
+    especialidade_id: int
+
+class EspecialidadeSchema(BaseModel):
+    nome: str
+
+class AgendaSchema(BaseModel):
+    medico_id: int
+    data: str        
+    horario: str    
+    disponivel: bool = True
+
+class AgendamentoSchema(BaseModel):
+    usuario_cpf: str
+    agenda: int
 
 MEDICOS_URL      = "http://localhost:8001"
 AGENDAMENTOS_URL = "http://localhost:8002"
@@ -73,8 +92,8 @@ def buscar_medico(id: int, request: Request):
 #caso contrário retornariam 200 mesmo quando não deu certo
 #payload recebe os dados enviados pelo frontend  requisição
 @app.post("/medicos", tags=["Médicos"], status_code=201)
-def criar_medico(payload: dict, request: Request):
-    resp = httpx.post(f"{MEDICOS_URL}/medicos/", json=payload)
+def criar_medico(payload: MedicoSchema, request: Request):
+    resp = httpx.post(f"{MEDICOS_URL}/medicos/", json=payload.model_dump())
     if resp.status_code not in (200, 201):
         raise HTTPException(status_code=resp.status_code, detail=resp.text)
     return add_hateoas(resp.json(), request, "medicos")
@@ -94,8 +113,8 @@ def listar_especialidades(request: Request):
 
 
 @app.post("/especialidades", tags=["Especialidades"], status_code=201)
-def criar_especialidade(payload: dict, request: Request):
-    resp = httpx.post(f"{MEDICOS_URL}/especialidades/", json=payload)
+def criar_especialidade(payload: EspecialidadeSchema, request: Request):
+    resp = httpx.post(f"{MEDICOS_URL}/especialidades/", json=payload.model_dump())
     if resp.status_code not in (200, 201):
         raise HTTPException(status_code=resp.status_code, detail=resp.text)
     return add_hateoas(resp.json(), request, "especialidades")
@@ -111,13 +130,11 @@ def listar_agendas(request: Request, medico_id: int = None):
 
 
 @app.post("/agendas", tags=["Agendamentos"], status_code=201)
-def criar_agenda(payload: dict, request: Request):
-    medico_id = payload.get("medico_id")
-    medico_resp = httpx.get(f"{MEDICOS_URL}/medicos/{medico_id}/")
+def criar_agenda(payload: AgendaSchema, request: Request):
+    medico_resp =  httpx.get(f"{MEDICOS_URL}/medicos/{payload.medico_id}/")
     if medico_resp.status_code != 200:
         raise HTTPException(status_code=400, detail="Médico não encontrado")
-    
-    resp = httpx.post(f"{AGENDAMENTOS_URL}/agendas/", json=payload)
+    resp = httpx.post(f"{AGENDAMENTOS_URL}/agendas/", json=payload.model_dump())
     if resp.status_code not in (200, 201):
         raise HTTPException(status_code=resp.status_code, detail=resp.text)
     return add_hateoas(resp.json(), request, "agendas")
@@ -136,8 +153,8 @@ def listar_agendamentos(request: Request):
 
 
 @app.post("/agendamentos", tags=["Agendamentos"], status_code=201)
-def criar_agendamento(payload: dict, request: Request):
-    resp = httpx.post(f"{AGENDAMENTOS_URL}/agendamentos/", json=payload)
+def criar_agendamento(payload: AgendamentoSchema, request: Request):
+    resp = httpx.post(f"{AGENDAMENTOS_URL}/agendamentos/", json=payload.model_dump())
     if resp.status_code not in (200, 201):
         raise HTTPException(status_code=resp.status_code, detail=resp.text)
     return add_hateoas(resp.json(), request, "agendamentos")
