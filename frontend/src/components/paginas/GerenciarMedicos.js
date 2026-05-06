@@ -42,7 +42,7 @@ export default function GerenciarMedicos() {
     try {
       const resultado = await api.createMedico({
         ...form,
-        especialidade: Number(form.especialidade),
+        especialidade_id: Number(form.especialidade),
       });
       if (resultado.id) {
         setMensagem('Médico cadastrado com sucesso!');
