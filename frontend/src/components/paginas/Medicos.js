@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { api } from '../../api';
 
-export default function Medicos() {
+export default function Medicos({ onVerAgendamentos }) {
   const [medicos, setMedicos] = useState([]);
   const [especialidades, setEspecialidades] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -37,6 +37,7 @@ export default function Medicos() {
               <th>Nome</th>
               <th>CRM</th>
               <th>Especialidade</th>
+              <th>Ações</th>
             </tr>
           </thead>
           <tbody>
@@ -45,6 +46,13 @@ export default function Medicos() {
                 <td>{m.nome}</td>
                 <td>{m.crm}</td>
                 <td>{nomeEspecialidade(m.especialidade)}</td>
+                <td>
+                  {m.links?.agendamentos && (
+                    <button onClick={onVerAgendamentos}>
+                      Ver Agendamentos
+                    </button>
+                  )}
+                </td>
               </tr>
             ))}
           </tbody>

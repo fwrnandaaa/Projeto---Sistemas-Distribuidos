@@ -38,7 +38,7 @@ function App() {
         {abaAtiva === 'marcar' && <NovoAgendamento onSucesso={() => setAbaAtiva('agendamentos')} />}
         {abaAtiva === 'agendamentos' && <Agendamentos />}
         {abaAtiva === 'agendas' && <Agendas />}
-        {abaAtiva === 'medicos' && <Medicos />}
+        {abaAtiva === 'medicos' && ( <Medicos onVerAgendamentos={() => setAbaAtiva('agendamentos')} /> )}
         {abaAtiva === 'gerenciar-medicos' && <GerenciarMedicos />}
       </main>
     </div>
