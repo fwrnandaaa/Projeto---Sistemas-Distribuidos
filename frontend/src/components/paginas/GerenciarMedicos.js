@@ -26,7 +26,7 @@ export default function GerenciarMedicos() {
   }, []);
 
   const nomeEspecialidade = (id) => {
-    const esp = especialidades.find(e => e.id === id);
+    const esp = especialidades.find(e => e.id == id);
     return esp ? esp.nome : `ID ${id}`;
   };
 
@@ -130,7 +130,7 @@ export default function GerenciarMedicos() {
                 <tr key={m.id}>
                   <td>{m.nome}</td>
                   <td>{m.crm}</td>
-                  <td>{nomeEspecialidade(m.especialidade)}</td>
+                  <td>{m.especialidade_detalhe ? m.especialidade_detalhe.nome : `ID ${m.especialidade}`}</td>
                   <td>
                     <button 
                       className="btn-delete" 

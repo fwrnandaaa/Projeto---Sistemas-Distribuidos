@@ -93,7 +93,9 @@ def buscar_medico(id: int, request: Request):
 #payload recebe os dados enviados pelo frontend  requisição
 @app.post("/medicos", tags=["Médicos"], status_code=201)
 def criar_medico(payload: MedicoSchema, request: Request):
-    resp = httpx.post(f"{MEDICOS_URL}/medicos/", json=payload.model_dump())
+    dados = payload.model_dump()
+    dados["especialidade"] = dados.pop("especialidade_id")
+    resp = httpx.post(f"{MEDICOS_URL}/medicos/", json=dados)
     if resp.status_code not in (200, 201):
         raise HTTPException(status_code=resp.status_code, detail=resp.text)
     return add_hateoas(resp.json(), request, "medicos")
