@@ -2,6 +2,7 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 import httpx
 from pydantic import BaseModel
+import re
 
 class MedicoSchema(BaseModel):
     nome: str
