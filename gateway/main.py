@@ -168,3 +168,59 @@ def cancelar_agendamento(id: int):
     resp = httpx.delete(f"{AGENDAMENTOS_URL}/agendamentos/{id}/")
     if resp.status_code == 404:
         raise HTTPException(status_code=404, detail="Agendamento não encontrado")
+
+SOAP_URL = "http://localhost:8003/"
+
+def chamar_soap(xml: str) -> str:
+    resposta = httpx.post(
+        SOAP_URL,
+        content=xml.encode("utf-8"),
+        headers={"Content-Type": "text/xml; charset=utf-8"}
+    )
+    return resposta.text
+
+@app.get("/convenio/planos", tags=["Convênio"])
+def listar_planos():
+    xml = """<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+                      xmlns:tns="clinica.convenio">
+       <soapenv:Body>
+          <tns:listar_planos_aceitos/>
+       </soapenv:Body>
+    </soapenv:Envelope>"""
+    resposta = chamar_soap(xml)
+    planos = re.findall(r"<[^>]*string[^>]*>(.*?)</[^>]*string>", resposta)
+    return {"planos": planos}
+
+@app.post("/convenio/cadastrar", tags=["Convênio"])
+def cadastrar_convenio(cpf: str, plano: str):
+    xml = f"""<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+                      xmlns:tns="clinica.convenio">
+       <soapenv:Body>
+          <tns:cadastrar_convenio>
+             <tns:cpf>{cpf}</tns:cpf>
+             <tns:plano>{plano}</tns:plano>
+          </tns:cadastrar_convenio>
+       </soapenv:Body>
+    </soapenv:Envelope>"""
+    resposta = chamar_soap(xml)
+    if "Fault" in resposta:
+        raise HTTPException(status_code=400, detail="Plano não aceito pela clínica")
+    resultado = re.findall(r"<[^>]*cadastrar_convenioResult[^>]*>(.*?)</[^>]*cadastrar_convenioResult>", resposta)
+    return {"resultado": resultado[0] if resultado else "Sem resposta"}
+
+@app.get("/convenio/verificar", tags=["Convênio"])
+def verificar_convenio(cpf: str, plano: str):
+    xml = f"""<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+                      xmlns:tns="clinica.convenio">
+       <soapenv:Body>
+          <tns:verificar_convenio>
+             <tns:cpf>{cpf}</tns:cpf>
+             <tns:plano>{plano}</tns:plano>
+          </tns:verificar_convenio>
+       </soapenv:Body>
+    </soapenv:Envelope>"""
+    resposta = chamar_soap(xml)
+    if "Fault" in resposta:
+        raise HTTPException(status_code=400, detail="Convênio não encontrado ou plano inválido")
+    resultado = re.findall(r"<[^>]*verificar_convenioResult[^>]*>(.*?)</[^>]*verificar_convenioResult>", resposta)
+    return {"resultado": resultado[0] if resultado else "Sem resposta"}
