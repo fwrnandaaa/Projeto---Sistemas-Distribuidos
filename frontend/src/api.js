@@ -57,5 +57,16 @@ export const api = {
     fetch(`/agendamentos/${id}/`, { method: 'DELETE' }),
 
   // Seguir qualquer link HATEOAS diretamente
-  follow: followLink,
+  follow: followLink, 
+  // Convênio
+  getPlanos: () =>
+    fetch('/convenio/planos').then(r => r.json()),
+
+  cadastrarConvenio: (cpf, plano) =>
+    fetch(`/convenio/cadastrar?cpf=${encodeURIComponent(cpf)}&plano=${encodeURIComponent(plano)}`, {
+      method: 'POST',
+    }).then(r => r.json()),
+
+  verificarConvenio: (cpf, plano) =>
+    fetch(`/convenio/verificar?cpf=${encodeURIComponent(cpf)}&plano=${encodeURIComponent(plano)}`).then(r => r.json()),
 };

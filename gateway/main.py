@@ -175,7 +175,8 @@ def chamar_soap(xml: str) -> str:
     resposta = httpx.post(
         SOAP_URL,
         content=xml.encode("utf-8"),
-        headers={"Content-Type": "text/xml; charset=utf-8"}
+        headers={"Content-Type": "text/xml; charset=utf-8"},
+        timeout=30.0
     )
     return resposta.text
 

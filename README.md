@@ -23,7 +23,7 @@ Antes de rodar pela primeira vez, instale as dependências em cada pasta.
 `pip install -r ../requirements.txt`
 
 # Gateway
-`cd gateway_fastapi`
+`cd gateway`
 
 `python -m venv venv`
 
@@ -31,13 +31,27 @@ Antes de rodar pela primeira vez, instale as dependências em cada pasta.
 
 `pip install -r ../requirements.txt`
 
+# Serviço SOAP (Convênios)
+`cd soap_convenios/servidor`
+
+`python -m venv venv`
+
+`venv\Scripts\Activate.ps1`
+
+`pip install -r ../../requirements.txt`
+
+# Cliente Java (Convênios)
+`cd soap_convenios/cliente`
+
+`javac ClienteSOAP.java`
+
 # Frontend
 `cd frontend`
 
 `npm install`
 
 # Como rodar o projeto
-Abra 4 terminais e rode um comando em cada:
+Abra 5 terminais e rode um comando em cada:
 
 # Terminal 1 — Serviço de Médicos (porta 8001)
 `cd servico_medicos`
@@ -54,15 +68,30 @@ Abra 4 terminais e rode um comando em cada:
 `python manage.py runserver 0.0.0.0:8002`
 
 # Terminal 3 — Gateway (porta 8000)
-`cd gateway_fastapi`
+`cd gateway`
 
 `venv\Scripts\Activate.ps1`
 
 `uvicorn main:app --reload --port 8000`
 
-# Terminal 4 — Frontend (porta 3000)
+# Terminal 4 — Serviço SOAP (porta 8003)
+`cd soap_convenios/servidor`
+
+`venv\Scripts\Activate.ps1`
+
+`python servidor.py`
+
+# Terminal 5 — Frontend (porta 3000)
 `cd frontend`
+
 `npm start`
+
+# Como rodar o cliente Java
+Com o servidor SOAP rodando, execute em um terminal separado:
+
+`cd soap_convenios/cliente`
+
+`java ClienteSOAP`
 
 # Links úteis
 | O que é | URL |
@@ -74,3 +103,5 @@ Abra 4 terminais e rode um comando em cada:
 | API Agendamentos | http://localhost:8002/agendamentos/ |
 | Admin Médicos | http://localhost:8001/admin |
 | Admin Agendamentos | http://localhost:8002/admin |
+| Servidor SOAP | http://localhost:8003 |
+| WSDL | http://localhost:8003/?wsdl |

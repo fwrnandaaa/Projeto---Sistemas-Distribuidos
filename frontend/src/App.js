@@ -5,6 +5,7 @@ import Agendas from './components/paginas/Agendas';
 import Agendamentos from './components/paginas/Agendamentos';
 import NovoAgendamento from './components/paginas/NovoAgendamento';
 import GerenciarMedicos from './components/paginas/GerenciarMedicos';
+import Convenio from './components/paginas/Convenio';
 
 const ABAS = [
   { id: 'marcar', label: 'Marcar Consulta' },
@@ -12,6 +13,7 @@ const ABAS = [
   { id: 'agendas', label: 'Gerenciar Agendas' },
   { id: 'medicos', label: 'Médicos' },
   { id: 'gerenciar-medicos', label: 'Gerenciar Médicos' },
+  { id: 'convenio', label: 'Convênio' },
 ];
 
 function App() {
@@ -38,6 +40,7 @@ function App() {
         {abaAtiva === 'marcar' && <NovoAgendamento onSucesso={() => setAbaAtiva('agendamentos')} />}
         {abaAtiva === 'agendamentos' && <Agendamentos />}
         {abaAtiva === 'agendas' && <Agendas />}
+        {abaAtiva === 'convenio' && <Convenio />}
         {abaAtiva === 'medicos' && ( <Medicos onVerAgendamentos={() => setAbaAtiva('agendamentos')} /> )}
         {abaAtiva === 'gerenciar-medicos' && <GerenciarMedicos />}
       </main>
