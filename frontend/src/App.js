@@ -6,6 +6,7 @@ import Agendamentos from './components/paginas/Agendamentos';
 import NovoAgendamento from './components/paginas/NovoAgendamento';
 import GerenciarMedicos from './components/paginas/GerenciarMedicos';
 import Convenio from './components/paginas/Convenio';
+import NotificacoesWebSocket from './components/NotificacoesWebSocket';
 
 const ABAS = [
   { id: 'marcar', label: 'Marcar Consulta' },
@@ -35,8 +36,9 @@ function App() {
           ))}
         </nav>
       </header>
-
+            
       <main className="conteudo">
+          <NotificacoesWebSocket />
         {abaAtiva === 'marcar' && <NovoAgendamento onSucesso={() => setAbaAtiva('agendamentos')} />}
         {abaAtiva === 'agendamentos' && <Agendamentos />}
         {abaAtiva === 'agendas' && <Agendas />}

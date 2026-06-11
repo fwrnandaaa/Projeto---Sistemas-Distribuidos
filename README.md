@@ -45,13 +45,22 @@ Antes de rodar pela primeira vez, instale as dependências em cada pasta.
 
 `javac ClienteSOAP.java`
 
+# Websocket_notificacoes 
+`cd websocket_notificacoes`
+
+`python -m venv venv`
+
+`venv\Scripts\Activate.ps1`
+
+`pip install -r ../requirements.txt`
+
 # Frontend
 `cd frontend`
 
 `npm install`
 
 # Como rodar o projeto
-Abra 5 terminais e rode um comando em cada:
+Abra 6 terminais e rode um comando em cada:
 
 # Terminal 1 — Serviço de Médicos (porta 8001)
 `cd servico_medicos`
@@ -86,6 +95,14 @@ Abra 5 terminais e rode um comando em cada:
 
 `npm start`
 
+# Terminal 6 — Serviço de Notificações WebSocket (porta 8004)
+
+`cd websocket_notificacoes`
+
+`venv\Scripts\Activate.ps1`
+
+`uvicorn server:app --reload --port 8004`
+
 # Como rodar o cliente Java
 Com o servidor SOAP rodando, execute em um terminal separado:
 
@@ -105,3 +122,5 @@ Com o servidor SOAP rodando, execute em um terminal separado:
 | Admin Agendamentos | http://localhost:8002/admin |
 | Servidor SOAP | http://localhost:8003 |
 | WSDL | http://localhost:8003/?wsdl |
+| Serviço de Notificações WebSocket | ws://localhost:8004/ws/notificacoes |
+| Health Check do WebSocket | http://localhost:8004/health |
