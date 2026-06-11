@@ -36,8 +36,9 @@ function App() {
           ))}
         </nav>
       </header>
-                <NotificacoesWebSocket />
+            
       <main className="conteudo">
+          <NotificacoesWebSocket />
         {abaAtiva === 'marcar' && <NovoAgendamento onSucesso={() => setAbaAtiva('agendamentos')} />}
         {abaAtiva === 'agendamentos' && <Agendamentos />}
         {abaAtiva === 'agendas' && <Agendas />}

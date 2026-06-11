@@ -15,25 +15,34 @@ export default function NotificacoesWebSocket() {
       try {
         const dados = JSON.parse(event.data);
 
-        setMensagens(listaAtual => [
-          ...listaAtual,
-          {
-            id: Date.now(),
-            tipo: dados.tipo || 'notificacao',
-            conteudo: dados.dados || dados,
-            enviado_em: dados.enviado_em || '',
-          },
-        ]);
+        // Não exibe mensagens técnicas de conexão na interface.
+        if (dados.tipo === 'conexao') {
+          return;
+        }
+
+        setMensagens(listaAtual =>
+          [
+            ...listaAtual,
+            {
+              id: Date.now(),
+              tipo: dados.tipo || 'notificacao',
+              conteudo: dados.dados || dados.conteudo || dados,
+              enviado_em: dados.enviado_em || '',
+            },
+          ].slice(-5)
+        );
       } catch {
-        setMensagens(listaAtual => [
-          ...listaAtual,
-          {
-            id: Date.now(),
-            tipo: 'mensagem',
-            conteudo: { mensagem: event.data },
-            enviado_em: '',
-          },
-        ]);
+        setMensagens(listaAtual =>
+          [
+            ...listaAtual,
+            {
+              id: Date.now(),
+              tipo: 'mensagem',
+              conteudo: { mensagem: event.data },
+              enviado_em: '',
+            },
+          ].slice(-5)
+        );
       }
     };
 
@@ -51,27 +60,45 @@ export default function NotificacoesWebSocket() {
   }, []);
 
   const textoMensagem = notificacao => {
-    if (typeof notificacao.conteudo === 'string') {
-      return notificacao.conteudo;
+    const conteudo = notificacao.conteudo;
+
+    if (typeof conteudo === 'string') {
+      return conteudo;
+    }
+
+    if (notificacao.tipo === 'novo_agendamento') {
+      const dadosAgendamento = conteudo.dados || conteudo;
+
+      return `Novo agendamento criado — Médico ID: ${dadosAgendamento.medico_id} | Data: ${dadosAgendamento.data} | Horário: ${dadosAgendamento.horario}`;
     }
 
     return (
-      notificacao.conteudo.mensagem ||
-      notificacao.conteudo.texto ||
-      JSON.stringify(notificacao.conteudo)
+      conteudo.mensagem ||
+      conteudo.texto ||
+      JSON.stringify(conteudo)
     );
   };
 
   return (
     <section className="notificacoes-websocket">
-      <p className="status-websocket">WebSocket: {status}</p>
+      <div className="notificacoes-cabecalho">
+        <span>🔔 Notificações em tempo real</span>
 
-      {mensagens.length > 0 && (
-        <ul>
-          {mensagens.map(notificacao => (
-            <li key={notificacao.id}>
-              <strong>{notificacao.tipo}:</strong> {textoMensagem(notificacao)}
-            </li>
+        <span className={`status-websocket status-${status}`}>
+          {status}
+        </span>
+      </div>
+
+      {mensagens.length === 0 ? (
+        <p className="notificacoes-vazio">
+          Nenhuma notificação recebida ainda.
+        </p>
+      ) : (
+        <ul className="lista-notificacoes">
+          {[...mensagens].reverse().map(notificacao => (
+            <li key={notificacao.id} className="notificacao-item">
+            {textoMensagem(notificacao)}
+          </li>
           ))}
         </ul>
       )}
