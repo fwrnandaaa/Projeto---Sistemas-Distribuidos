@@ -69,7 +69,7 @@ export default function NotificacoesWebSocket() {
     if (notificacao.tipo === 'novo_agendamento') {
       const dadosAgendamento = conteudo.dados || conteudo;
 
-      return `Novo agendamento criado — Médico ID: ${dadosAgendamento.medico_id} | Data: ${dadosAgendamento.data} | Horário: ${dadosAgendamento.horario}`;
+      return `Novo agendamento criado — Data: ${dadosAgendamento.data} | Horário: ${dadosAgendamento.horario}`;
     }
 
     return (
