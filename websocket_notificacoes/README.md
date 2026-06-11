@@ -1,16 +1,24 @@
 # Serviço de Notificações WebSocket
 
-Microserviço responsável pela comunicação em tempo real utilizando WebSocket.
+Microserviço responsável pela comunicação em tempo real utilizando o protocolo WebSocket.
 
 O objetivo deste serviço é demonstrar o funcionamento de conexões persistentes, envio de mensagens em tempo real e distribuição de eventos para múltiplos clientes conectados simultaneamente.
 
-Este serviço foi implementado de forma independente da arquitetura REST existente, atuando como um componente especializado em notificações em tempo real.
+Este serviço atua como um componente especializado em notificações em tempo real dentro da arquitetura do sistema de agendamento de consultas.
 
-Atualmente, ele não está integrado ao gateway, frontend React ou serviço de agendamentos. Entretanto, sua estrutura já está preparada para receber eventos desses serviços futuramente.
+Atualmente, ele está integrado ao frontend React e ao serviço de agendamentos, permitindo que novos agendamentos gerem notificações automaticamente para todos os clientes conectados.
+
+---
 
 ## Porta
 
-O serviço deve rodar na porta `8004`.
+O serviço deve ser executado na porta:
+
+```text
+8004
+```
+
+---
 
 ## Como executar
 
@@ -21,78 +29,84 @@ cd websocket_notificacoes
 uvicorn server:app --reload --port 8004
 ```
 
-Também é possível executar diretamente:
-
-```powershell
-cd websocket_notificacoes
-python server.py
-```
+---
 
 ## Estrutura
 
 ```text
 websocket_notificacoes/
+├── __init__.py
 ├── server.py
 ├── broadcaster.py
-├── painel_websocket.html
 └── README.md
 ```
 
-### Responsabilidades dos arquivos
+---
 
-#### server.py
+## Responsabilidades dos arquivos
 
-Responsável pelo ciclo de vida das conexões WebSocket:
+### server.py
 
-* inicialização do serviço;
-* aceitação de novas conexões;
-* recebimento de mensagens;
-* registro de eventos no console;
-* encaminhamento de mensagens para broadcast.
+Responsável pelo ciclo de vida das conexões WebSocket.
 
-#### broadcaster.py
+Principais responsabilidades:
 
-Responsável pelo gerenciamento dos clientes conectados:
+* inicializar o serviço;
+* aceitar novas conexões;
+* receber mensagens;
+* registrar eventos no console;
+* disponibilizar endpoints HTTP auxiliares;
+* encaminhar mensagens para broadcast.
 
-* armazenamento das conexões ativas;
-* remoção de conexões encerradas;
-* contagem de clientes conectados;
-* envio de mensagens para todos os clientes simultaneamente (broadcast).
+---
 
-#### painel_websocket.html
+### broadcaster.py
 
-Interface simples utilizada para testes e demonstração da atividade.
+Responsável pelo gerenciamento dos clientes conectados.
 
-Permite:
+Principais responsabilidades:
 
-* conectar ao servidor WebSocket;
-* enviar mensagens;
-* visualizar mensagens recebidas em tempo real;
-* simular múltiplos clientes abrindo mais de uma aba do navegador.
+* armazenar conexões ativas;
+* remover conexões encerradas;
+* contabilizar clientes conectados;
+* enviar mensagens para todos os clientes simultaneamente (broadcast).
+
+---
 
 ## Endpoints
 
 | Tipo      | Rota                 | Descrição                                                          |
 | --------- | -------------------- | ------------------------------------------------------------------ |
 | HTTP      | `GET /health`        | Verifica o status do serviço e a quantidade de clientes conectados |
-| HTTP      | `POST /notificacoes` | Publica uma notificação manual para todos os clientes conectados   |
+| HTTP      | `POST /notificacoes` | Publica uma notificação para todos os clientes conectados          |
 | WebSocket | `/ws/notificacoes`   | Canal de comunicação em tempo real                                 |
 
-## Interface de teste
+---
 
-Abra o arquivo `painel_websocket.html` em duas abas do navegador.
+## Health Check
 
-A interface estabelece conexão com:
+O endpoint:
 
 ```text
-ws://localhost:8004/ws/notificacoes
+GET /health
 ```
 
-Cada aba representa um cliente WebSocket independente.
+permite verificar se o serviço está ativo.
 
-As mensagens enviadas por qualquer cliente serão distribuídas automaticamente para todos os clientes conectados.
+Exemplo de resposta:
 
-## Exemplo de publicação manual
+```json
+{
+  "status": "ok",
+  "clientes_conectados": 2
+}
+```
+
+---
+
+## Publicação manual de notificações
+
+Para testes, é possível publicar notificações manualmente utilizando:
 
 ```powershell
 Invoke-RestMethod `
@@ -102,42 +116,75 @@ Invoke-RestMethod `
   -Body '{"tipo":"teste","mensagem":"Servico WebSocket funcionando","dados":{}}'
 ```
 
-## Exemplo de mensagem WebSocket
+---
+
+## Exemplo de mensagem
+
+Exemplo de evento enviado para os clientes conectados:
 
 ```json
 {
   "tipo": "novo_agendamento",
   "dados": {
-    "medico": "Dr. João",
-    "data": "10/06",
-    "hora": "14:00"
+    "medico_id": 4,
+    "data": "2026-07-04",
+    "horario": "12:00:00"
   }
 }
 ```
 
+---
+
+## Integração implementada
+
+Atualmente o serviço recebe notificações geradas pelo serviço de agendamentos.
+
+Quando um novo agendamento é criado:
+
+1. O frontend envia uma requisição para o serviço de agendamentos.
+2. O serviço de agendamentos salva o novo registro.
+3. O serviço de agendamentos envia uma notificação para o microserviço WebSocket.
+4. O microserviço WebSocket realiza broadcast para todos os clientes conectados.
+5. O frontend recebe a atualização automaticamente, sem necessidade de recarregar a página.
+
+---
+
 ## Fluxo de funcionamento
 
 ```text
-Cliente A
-      │
-      ▼
+Frontend React
+        │
+        ▼
+POST /agendamentos
+        │
+        ▼
+Serviço de Agendamentos
+        │
+        ▼
+POST /notificacoes
+        │
+        ▼
 WebSocket
-      │
-      ├────► Cliente A
-      ├────► Cliente B
-      └────► Cliente C
+        │
+        ├────► Cliente A
+        ├────► Cliente B
+        └────► Cliente C
 ```
 
-Quando uma mensagem é recebida pelo servidor, ela é enviada para todos os clientes conectados por meio do mecanismo de broadcast.
+---
 
-## Possíveis integrações futuras
+## Requisitos atendidos
 
-O serviço foi projetado para receber eventos gerados por outros componentes do sistema, como:
+A implementação atende aos requisitos da atividade:
 
-* novo agendamento criado;
-* agendamento cancelado;
-* agenda criada ou removida;
-* médico atualizado;
-* alteração de disponibilidade.
+* utilização explícita do protocolo WebSocket (`ws://`);
+* comunicação bidirecional entre cliente e servidor;
+* envio de mensagens do servidor para todos os clientes conectados (broadcast);
+* suporte a múltiplos clientes simultâneos;
+* atualização automática da interface;
+* registro de abertura de conexão;
+* registro de recebimento de mensagens;
+* registro de encerramento de conexão.
 
-Nesses cenários, o gateway ou o serviço de agendamentos poderá publicar um evento para este microserviço, que ficará responsável por distribuir a atualização em tempo real para todos os clientes conectados.
+
+
