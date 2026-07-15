@@ -21,3 +21,6 @@ httpx>=0.27
 spyne @ git+https://github.com/arskom/spyne.git
 lxml>=5.0
 six>=1.16
+
+# Middleware Orientado a Mensagens - RabbitMQ
+pika>=1.3
