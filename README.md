@@ -263,9 +263,20 @@ Este serviço consome a fila `fila_auditoria`.
 3. Confirmar que o servico de relatorios gRPC NAO esta em execucao.
 4. Criar um novo agendamento no frontend.
 5. Confirmar logs:
-	- Agendamentos: `[MOM] Evento publicado no RabbitMQ`
-	- WebSocket: `[MOM] Evento recebido`
-	- Auditoria: `[AUDITORIA] Evento recebido`
+   - Agendamentos: `[MOM] Evento publicado no RabbitMQ`
+   - WebSocket: `[MOM] Evento recebido`
+   - Auditoria: `[AUDITORIA] Evento recebido`
+
+# Como verificar no RabbitMQ
+
+- Acesse http://127.0.0.1:15672.
+- Abra "Queues and Streams".
+- Confirme as filas:
+  - `fila_websocket`
+  - `fila_auditoria`
+- Abra "Exchanges".
+- Confirme a exchange:
+  - `agendamentos`
 
 # Como rodar o cliente Java
 Com o servidor SOAP rodando, execute em um terminal separado:

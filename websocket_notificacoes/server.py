@@ -5,8 +5,9 @@ Este arquivo inicializa o serviço de notificações em tempo real,
 aceita conexões WebSocket, recebe mensagens dos clientes e encaminha
 essas mensagens para todos os clientes conectados por meio do broadcast.
 """
-
 from __future__ import annotations
+
+import asyncio
 
 import json
 from datetime import datetime, timezone
@@ -15,6 +16,10 @@ from uuid import uuid4
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from pydantic import BaseModel, Field
+
+import threading #adições relativas ao projeto mom
+
+from messaging.consumer import iniciar_consumidor #adições relativas ao projeto mom
 
 try:
     from .broadcaster import (
@@ -141,6 +146,17 @@ async def websocket_notificacoes(websocket: WebSocket) -> None:
         print(f"Conexão encerrada: cliente {cliente_id}")
         print(f"Clientes conectados: {count_connections()}")
 
+#PROJETO MOM
+@app.on_event("startup")
+async def iniciar_mom():
+    loop = asyncio.get_running_loop()
+
+    threading.Thread(
+        target=iniciar_consumidor,
+        args=(loop,),
+        daemon=True,
+    ).start()
+#até aqui
 
 if __name__ == "__main__":
     import uvicorn
