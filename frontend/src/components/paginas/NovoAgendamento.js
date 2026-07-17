@@ -12,8 +12,14 @@ export default function NovoAgendamento({ onSucesso }) {
   const [filtroMedico, setFiltroMedico] = useState('');
 
   useEffect(() => {
-    api.getAgendas().then(data => setAgendas(data.filter(a => a.disponivel)));
-    api.getMedicos().then(setMedicos);
+    Promise.all([api.getAgendas(), api.getMedicos()])
+      .then(([agendasRecebidas, medicosRecebidos]) => {
+        setAgendas(agendasRecebidas.filter(a => a.disponivel));
+        setMedicos(medicosRecebidos);
+      })
+      .catch(() => {
+        setMensagem('Não foi possível carregar médicos e horários. Verifique se o gateway está em execução.');
+      });
   }, []);
 
   const nomeMedico = (id) => {
@@ -44,7 +50,9 @@ export default function NovoAgendamento({ onSucesso }) {
         setForm(initForm);
         setFiltroMedico('');
         // atualiza lista de agendas disponíveis
-        api.getAgendas().then(data => setAgendas(data.filter(a => a.disponivel)));
+        api.getAgendas()
+          .then(data => setAgendas(data.filter(a => a.disponivel)))
+          .catch(() => setMensagem('Consulta criada, mas não foi possível atualizar os horários.'));
         if (onSucesso) onSucesso();
       } else {
         setMensagem('Erro: ' + JSON.stringify(resultado));

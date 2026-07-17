@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package relatorio;
+
+service RelatorioService {
+  rpc GerarDashboard(Vazio) returns (DashboardResponse);
+  rpc RegistrarAgendamento(NovoAgendamentoRequest) returns (AgendamentoResponse);
+}
+
+message Vazio {}
+
+message NovoAgendamentoRequest {
+  int32 agenda_id = 1;
+  string usuario_cpf = 2;
+}
+
+message AgendamentoResponse {
+  bool sucesso = 1;
+  string mensagem = 2;
+  int32 agendamento_id = 3;
+}
+
+message DashboardResponse {
+  int32 total_medicos = 1;
+  int32 total_consultas = 2;
+  int32 consultas_hoje = 3;
+  string especialidade_mais_procurada = 4;
+  string medico_mais_procurado = 5;
+}

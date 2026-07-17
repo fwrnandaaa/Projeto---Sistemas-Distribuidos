@@ -31,6 +31,15 @@ Antes de rodar pela primeira vez, instale as dependências em cada pasta.
 
 `pip install -r ../requirements.txt`
 
+# Serviço de Relatórios (gRPC)
+`cd servico_relatorios`
+
+`python -m venv venv`
+
+`venv\Scripts\Activate.ps1`
+
+`pip install -r ../requirements.txt`
+
 # Serviço SOAP (Convênios)
 `cd soap_convenios/servidor`
 
@@ -60,7 +69,7 @@ Antes de rodar pela primeira vez, instale as dependências em cada pasta.
 `npm install`
 
 # Como rodar o projeto
-Abra 6 terminais e rode um comando em cada:
+Abra 7 terminais e rode um comando em cada:
 
 # Terminal 1 — Serviço de Médicos (porta 8001)
 `cd servico_medicos`
@@ -83,19 +92,28 @@ Abra 6 terminais e rode um comando em cada:
 
 `uvicorn main:app --reload --port 8000`
 
-# Terminal 4 — Serviço SOAP (porta 8003)
+# Terminal 4 — Serviço de Relatórios gRPC (porta 8005)
+O serviço consulta os serviços de Médicos e Agendamentos; portanto, inicie-o depois dos terminais 1 e 2.
+
+`cd servico_relatorios`
+
+`venv\Scripts\Activate.ps1`
+
+`python server.py`
+
+# Terminal 5 — Serviço SOAP (porta 8003)
 `cd soap_convenios/servidor`
 
 `venv\Scripts\Activate.ps1`
 
 `python servidor.py`
 
-# Terminal 5 — Frontend (porta 3000)
+# Terminal 6 — Frontend (porta 3000)
 `cd frontend`
 
 `npm start`
 
-# Terminal 6 — Serviço de Notificações WebSocket (porta 8004)
+# Terminal 7 — Serviço de Notificações WebSocket (porta 8004)
 
 `cd websocket_notificacoes`
 
@@ -124,3 +142,5 @@ Com o servidor SOAP rodando, execute em um terminal separado:
 | WSDL | http://localhost:8003/?wsdl |
 | Serviço de Notificações WebSocket | ws://localhost:8004/ws/notificacoes |
 | Health Check do WebSocket | http://localhost:8004/health |
+| Serviço gRPC de Relatórios | localhost:8005 |
+| Dashboard de Relatórios via Gateway | http://localhost:8000/relatorios/dashboard |

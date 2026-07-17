@@ -3,6 +3,11 @@ from fastapi.middleware.cors import CORSMiddleware
 import httpx
 from pydantic import BaseModel
 import re
+import relatorios_client
+
+class NovoAgendamentoGrpcSchema(BaseModel):
+    agenda_id: int
+    usuario_cpf: str
 
 class MedicoSchema(BaseModel):
     nome: str
@@ -225,3 +230,24 @@ def verificar_convenio(cpf: str, plano: str):
         raise HTTPException(status_code=400, detail="Convênio não encontrado ou plano inválido")
     resultado = re.findall(r"<[^>]*verificar_convenioResult[^>]*>(.*?)</[^>]*verificar_convenioResult>", resposta)
     return {"resultado": resultado[0] if resultado else "Sem resposta"}
+
+@app.get("/relatorios/dashboard", tags=["Relatórios (gRPC)"])
+def obter_dashboard():
+    try:
+        return relatorios_client.gerar_dashboard()
+    except Exception as erro:
+        raise HTTPException(status_code=503, detail=f"Serviço de Relatórios indisponível: {erro}")
+
+
+@app.post("/relatorios/agendamentos", tags=["Relatórios (gRPC)"], status_code=201)
+def registrar_agendamento_via_grpc(payload: NovoAgendamentoGrpcSchema):
+    try:
+        resultado = relatorios_client.registrar_agendamento(
+            agenda_id=payload.agenda_id, usuario_cpf=payload.usuario_cpf
+        )
+    except Exception as erro:
+        raise HTTPException(status_code=503, detail=f"Serviço de Relatórios indisponível: {erro}")
+
+    if not resultado["sucesso"]:
+        raise HTTPException(status_code=400, detail=resultado["mensagem"])
+    return resultado

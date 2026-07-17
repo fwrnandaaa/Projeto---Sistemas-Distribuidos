@@ -56,6 +56,15 @@ export const api = {
   deleteAgendamento: (id) =>
     fetch(`/agendamentos/${id}/`, { method: 'DELETE' }),
 
+  // Relatórios: o gateway converte esta chamada HTTP em uma chamada gRPC.
+  getDashboardRelatorios: async () => {
+    const resposta = await fetch('/relatorios/dashboard');
+    if (!resposta.ok) {
+      throw new Error('Não foi possível carregar os relatórios.');
+    }
+    return resposta.json();
+  },
+
   // Seguir qualquer link HATEOAS diretamente
   follow: followLink, 
   // Convênio

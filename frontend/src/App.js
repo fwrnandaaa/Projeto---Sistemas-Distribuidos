@@ -6,6 +6,7 @@ import Agendamentos from './components/paginas/Agendamentos';
 import NovoAgendamento from './components/paginas/NovoAgendamento';
 import GerenciarMedicos from './components/paginas/GerenciarMedicos';
 import Convenio from './components/paginas/Convenio';
+import Relatorios from './components/paginas/Relatorios';
 import NotificacoesWebSocket from './components/NotificacoesWebSocket';
 
 const ABAS = [
@@ -15,6 +16,7 @@ const ABAS = [
   { id: 'medicos', label: 'Médicos' },
   { id: 'gerenciar-medicos', label: 'Gerenciar Médicos' },
   { id: 'convenio', label: 'Convênio' },
+  { id: 'relatorios', label: 'Relatórios' },
 ];
 
 function App() {
@@ -43,6 +45,7 @@ function App() {
         {abaAtiva === 'agendamentos' && <Agendamentos />}
         {abaAtiva === 'agendas' && <Agendas />}
         {abaAtiva === 'convenio' && <Convenio />}
+        {abaAtiva === 'relatorios' && <Relatorios />}
         {abaAtiva === 'medicos' && ( <Medicos onVerAgendamentos={() => setAbaAtiva('agendamentos')} /> )}
         {abaAtiva === 'gerenciar-medicos' && <GerenciarMedicos />}
       </main>
